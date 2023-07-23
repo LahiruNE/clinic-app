@@ -1,12 +1,32 @@
 import {app, BrowserWindow, screen} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
+import { DataSource } from 'typeorm';
+import { Patient } from '../src/data/models/patient-schema.model';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
-function createWindow(): BrowserWindow {
+async function createWindow(): Promise<BrowserWindow> {
+  const AppDataSource = new DataSource({
+    type: 'sqlite',
+    synchronize: true,
+    logging: true,
+    logger: 'simple-console',
+    database: './src/data/database/clinic-app-db.db',
+    entities: [ Patient ],
+  });
+
+  AppDataSource.initialize()
+    .then(() => {
+        console.log("Data Source has been initialized!")
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization", err)
+    })
+
+  const itemRepo = AppDataSource.getRepository(Patient);
 
   const size = screen.getPrimaryDisplay().workAreaSize;
 

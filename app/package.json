@@ -9,5 +9,7 @@
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17"
   }
 }
