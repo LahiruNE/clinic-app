@@ -1,8 +1,9 @@
-import {app, BrowserWindow, screen} from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import { DataSource } from 'typeorm';
 import { Patient } from '../src/data/models/patient-schema.model';
+import { User } from '../src/data/models/user-schema.model';
 
 let win: BrowserWindow | null = null;
 const args = process.argv.slice(1),
@@ -15,18 +16,19 @@ async function createWindow(): Promise<BrowserWindow> {
     logging: true,
     logger: 'simple-console',
     database: './src/data/database/clinic-app-db.db',
-    entities: [ Patient ],
+    entities: [Patient, User],
   });
 
   AppDataSource.initialize()
     .then(() => {
-        console.log("Data Source has been initialized!")
+      console.log("Data Source has been initialized!")
     })
     .catch((err) => {
-        console.error("Error during Data Source initialization", err)
+      console.error("Error during Data Source initialization", err)
     })
 
-  const itemRepo = AppDataSource.getRepository(Patient);
+  const patientRepo = AppDataSource.getRepository(Patient);
+  const userRepo = AppDataSource.getRepository(User);
 
   const size = screen.getPrimaryDisplay().workAreaSize;
 
@@ -54,7 +56,7 @@ async function createWindow(): Promise<BrowserWindow> {
     let pathIndex = './index.html';
 
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
-       // Path when running electron in local folder
+      // Path when running electron in local folder
       pathIndex = '../dist/index.html';
     }
 
@@ -68,6 +70,17 @@ async function createWindow(): Promise<BrowserWindow> {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null;
+  });
+
+  win.webContents.openDevTools();
+
+  ipcMain.on('authenticate', async (event: any, ...args: any[]) => {
+    try {
+      const result = await userRepo.findOne({ where: { username: args[0], password: args[1] }});
+      event.returnValue = result;
+    } catch (err) {
+      throw err;
+    }
   });
 
   return win;

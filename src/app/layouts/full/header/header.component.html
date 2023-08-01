@@ -5,33 +5,11 @@
   </button>
   <!-- --------------------------------------------------------------- -->
 
-  <!-- --------------------------------------------------------------- -->
-  <!-- Notification Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-
-  <button mat-icon-button aria-label="Notifications">
-    <i-tabler
-      class="d-flex"
-      name="bell"
-      matBadge="1"
-      matBadgeColor="primary"
-    ></i-tabler>
-  </button>
-
   <span class="flex-1-auto"></span>
 
   <!-- --------------------------------------------------------------- -->
   <!-- profile Dropdown -->
-  <!-- --------------------------------------------------------------- -->
-  <a
-    mat-flat-button
-    color="primary"
-    href="https://adminmart.com/"
-    target="_blank"
-    class="d-flex justify-content-center"
-  >
-    Download Free
-  </a>
+  <!-- --------------------------------------------------------------- -->  
   <button
     mat-icon-button
     [matMenuTriggerFor]="profilemenu"
@@ -65,7 +43,7 @@
 
     <div class="p-x-12 m-t-12">
       <a
-        [routerLink]="['/authentication/login']"
+        (click)="logout()"
         mat-stroked-button
         color="primary"
         class="w-100"
